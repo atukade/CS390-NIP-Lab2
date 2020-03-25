@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[76]:
-
-
 import os
 import numpy as np
 import tensorflow as tf
@@ -16,20 +10,12 @@ from tensorflow.keras.applications import vgg19
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 import warnings
 
-
-# In[8]:
-
-
 random.seed(1618)
 np.random.seed(1618)
 tf.set_random_seed(1618)
 
 tf.logging.set_verbosity(tf.logging.ERROR)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
-
-# In[135]:
-
 
 CONTENT_IMG_PATH = "nature_resize.jpg"           #TODO: Add this.
 STYLE_IMG_PATH = "starry_resize.jpg"             #TODO: Add this.
@@ -48,17 +34,9 @@ TOTAL_WEIGHT = 100.0
 TRANSFER_ROUNDS = 10
 
 f_outputs = None
-# width, height = load_img(CONTENT_IMG_PATH).size
-# img_nrows = 500
-# img_ncols = int(width * img_nrows / height)
-
-
-# In[136]:
-
 
 #=============================<Helper Fuctions>=================================
 '''
-TODO: implement this.
 This function should take the tensor and re-convert it to an image.
 '''
 def deprocessImage(img):
@@ -81,9 +59,6 @@ def gramMatrix(x):
     features = K.batch_flatten(K.permute_dimensions(x, (2, 0, 1)))
     gram = K.dot(features, K.transpose(features))
     return gram
-
-
-# In[137]:
 
 
 #========================<Loss Function Builder Functions>======================
@@ -109,10 +84,6 @@ def totalLoss(x):
         b = K.square(
             x[:, :CONTENT_IMG_H - 1, :CONTENT_IMG_H - 1, :] - x[:, :CONTENT_IMG_H - 1, 1:, :])
     return K.sum(K.pow(a + b, 1.25))
-
-
-# In[138]:
-
 
 #=========================<Pipeline Functions>==================================
 
@@ -140,11 +111,7 @@ def preprocessData(raw):
     return img
 
 
-# In[139]:
-
-
 '''
-TODO: Allot of stuff needs to be implemented in this function.
 First, make sure the model is set up properly.
 Then construct the loss function (from content and style loss).
 Gradient functions will also need to be created, or you can use K.Gradients().
@@ -184,9 +151,7 @@ def styleTransfer(cData, sData, tData):
         s = styleLoss(style_features, gen_features)
         loss = loss + (STYLE_WEIGHT / len(styleLayerNames)) * s
     loss = loss + TOTAL_WEIGHT * totalLoss(genTensor)
-    
-    # TODO: Setup gradients or use K.gradients().
-    
+        
     grads = K.gradients(loss, genTensor)[0]
     #grads /= (K.sqrt(K.mean(K.square(grads))) + 1e-5)
     
@@ -208,15 +173,6 @@ def styleTransfer(cData, sData, tData):
     
     for i in range(TRANSFER_ROUNDS):
         print("   Step %d." % i)
-        #TODO: perform gradient descent using fmin_l_bfgs_b.
-#         outs = f_outputs([cData])
-        
-#         loss_value = outs[0]
-#         if len(outs[1:]) == 1:
-#             print("In here")
-#             grad_values = outs[1].flatten().astype('float64')
-#         else:
-#             grad_values = np.array(outs[1:]).flatten().astype('float64')
         cData, min_val, info = fmin_l_bfgs_b(evaluator.loss, cData.flatten(), fprime=evaluator.grads, maxfun=20)
         print('Current loss value:', min_val)
         img = deprocessImage(cData.copy())
@@ -261,10 +217,6 @@ def eval_loss_and_grads(x):
         grad_values = np.array(outs[1:]).flatten().astype('float64')
     return loss_value, grad_values
 
-
-# In[ ]:
-
-
 #=========================<Main>================================================
 
 def main():
@@ -280,16 +232,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
